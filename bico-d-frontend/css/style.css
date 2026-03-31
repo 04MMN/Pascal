@@ -1,0 +1,61 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f4f9f4;
+}
+
+header {
+  background: #2e7d32;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  background: #388e3c;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 15px;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background: #2e7d32;
+}
+
+main {
+  padding: 20px;
+}
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-left: 5px solid #4caf50;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background: #2e7d32;
+  color: white;
+}

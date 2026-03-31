@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Saisie Citation</title>
+</head>
+<body>
+    <form action="recupnouvelle_citation.php" method="GET">
+        <fieldset>
+            <legend>Informations</legend>
+            <br>
+            Texte de la citation : <input type="text" size="27" name="citation"><br><br>
+            Prénom de l'auteur : <input type="text" size="24" name="prenom"><br><br>
+            Nom de l'auteur : <input type="text" size="24" name="nom_auteur"><br><br>
+            Siècle : <input type="text" size="27" name="siecle"><br><br>
+
+            Auteur : 
+            <select name="id_auteur">
+                <?php
+                $MySql_Host = "localhost"; 
+                $MySql_User = "root"; 
+                $MySql_Passw = "Ndao2004"; 
+                $bdd = "exo";
+
+                // Connexion avec MySQLi
+                $conn = mysqli_connect($MySql_Host, $MySql_User, $MySql_Passw, $bdd);
+
+                if (!$conn) {
+                    die("Erreur de connexion : " . mysqli_connect_error());
+                }
+
+                $query = "SELECT * FROM auteur"; 
+                $result = mysqli_query($conn, $query); 
+
+                while($row = mysqli_fetch_array($result)) {
+                    // On suppose ici : index 0 = ID, 1 = Nom, 2 = Prénom
+                    echo '<option value="'.$row[0].'">'.$row[2].' '.$row[1].'</option>';
+                }
+
+                mysqli_close($conn);
+                ?>
+            </select>
+            <br>
+        </fieldset>
+        <br>
+        <input type="submit" name="val" value="Enregistrer">
+    </form>
+</body>
+</html>

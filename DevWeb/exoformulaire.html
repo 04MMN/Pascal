@@ -1,0 +1,45 @@
+<html>
+<head>
+    <title>Formulaire</title>
+    <script>
+        function validerFormulaire() {
+            // Récupération des valeurs des champs
+            var prenom = document.getElementById("prenom").value;
+            var nom = document.getElementById("nom").value;
+            var mdp = document.getElementById("mdp").value;
+
+            // Vérification si un champ est vide
+            if (prenom == "" || nom == "" || mdp == "") {
+                alert("Erreur : Tous les champs doivent être remplis !");
+                return false; // Empêche l'envoi du formulaire
+            }
+            
+            alert("Formulaire envoyé avec succès !");
+            return true; // Autorise l'envoi
+        }
+    </script>
+</head>
+<body align="center">
+    <h1>Formulaire D'inscription</h1>
+    <form onsubmit="return validerFormulaire()">
+        <table align="center"> 
+            <tr> 
+                <td>Prénom</td> 
+                <td><input type="text" id="prenom"/></td> 
+            </tr>
+            <tr> 
+                <td>Nom</td> 
+                <td><input type="text" id="nom"/></td> 
+            </tr>
+            <tr> 
+                <td>Mot de passe</td> 
+                <td><input type="password" id="mdp"/></td> 
+            </tr>
+            <tr>
+                <td><input type="submit" value="ok"></td>
+                <td><input type="reset" value="annuler"></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

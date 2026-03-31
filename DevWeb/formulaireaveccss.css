@@ -1,0 +1,21 @@
+div#mancity {
+	width:600px;
+	height:150px;
+	background-color:#00CCFF;
+	}
+div#lien {
+	float:left;
+	width:100px;
+	height:400px;
+	background-color:#FF6699;
+	}
+div#contenu {
+	width:600px;
+	height:400px;
+	background-color:#FFCC00;
+	}
+
+img{
+        width:600px;
+	height:150px;
+}

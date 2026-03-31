@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BICO-D | Smart Agriculture Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>BICO-D Platform</h1>
+  <p>AI-driven Collaborative Drone Management for Precision Agriculture</p>
+
+</header>
+
+<nav>
+  <button onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('drones')">Shared Drones</button>
+  <button onclick="showSection('missions')">Missions</button>
+  <button onclick="showSection('analysis')">AI Analysis</button>
+</nav>
+
+<main>
+  <section id="dashboard" class="active">
+    <h2>Dashboard</h2>
+    <div class="cards">
+      <div class="card">Available Drones: <span id="droneCount">3</span></div>
+      <div class="card">Active Missions: 2</div>
+      <div class="card">AI Alerts: 1</div>
+    </div>
+<div class="card">
+  <img src="assets/drone.svg" width="50">
+  <p>Shared Drone</p>
+</div>
+
+  </section>
+
+  <section id="drones">
+    <h2>Shared Drone Fleet</h2>
+    <ul id="droneList"></ul>
+<div class="card">
+  <img src="assets/drone.svg" width="50">
+  <p>Shared Drone</p>
+</div>
+
+  </section>
+
+  <section id="missions">
+    <h2>Mission Planning</h2>
+    <button onclick="createMission()">Plan New Mission</button>
+    <p id="missionStatus"></p>
+<div class="card">
+  <img src="assets/drone.svg" width="50">
+  <p>Shared Drone</p>
+</div>
+
+  </section>
+
+  <section id="analysis">
+    <h2>AI Crop Analysis</h2>
+    <p>NDVI: <strong>0.78</strong></p>
+    <p>Crop Stress Detected: <strong>Low</strong></p>
+    <p>Recommended Action: <strong>Targeted Irrigation</strong></p>
+<div class="card">
+  <img src="assets/drone.svg" width="50">
+  <p>Shared Drone</p>
+</div>
+
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 BICO-D | Smart & Sustainable Agriculture</p>
+</footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>

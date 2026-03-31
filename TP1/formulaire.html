@@ -1,0 +1,64 @@
+<html>
+<body style="font-family: Arial, sans-serif;">
+    <marquee behavior="alternate">
+        <h4><font color="blue"><h2>Fichier .html appelle un fichier .php</h2></font></h4>
+    </marquee>
+    <br><br><br>
+
+    <table align="center" cellpadding="10">
+        <form action="recup.php" method="POST">
+            <tr>
+                <td>Prenom</td>
+                <td><input type="text" name="pr" required></td>
+            </tr>
+            <tr>
+                <td>Nom</td>
+                <td><input type="text" name="nm" required></td>
+            </tr>
+            <tr>
+                <td>Age</td>
+                <td><input type="number" name="age" required></td>
+            </tr>
+            
+            <tr>
+                <td>Genre</td>
+                <td>
+                    <input type="radio" name="g" value="F" id="f" required> <label for="f">F</label>
+                    <input type="radio" name="g" value="M" id="m"> <label for="m">M</label>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Adresse</td>
+                <td><input type="text" name="ad"></td>
+            </tr>
+
+            <tr>
+                <td>Groupe Sanguin</td>
+                <td>
+                    <select name="gs" required>
+                        <option value="">selectionner votre Groupe</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="AB">AB</option>
+                        <option value="O">O</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Rhesus</td>
+                <td>
+                    <input type="radio" name="rh" value="+" id="pos" required> <label for="pos">+</label>
+                    <input type="radio" name="rh" value="-" id="neg"> <label for="neg">-</label>
+                </td>
+            </tr>
+
+            <tr>
+                <td><input type="submit" name="val" value="Valider"></td>
+                <td><input type="reset" name="an" value="Effacer"></td>
+            </tr>
+        </form>
+    </table>
+</body>
+</html>
