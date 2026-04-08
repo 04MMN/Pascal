@@ -38,4 +38,6 @@ if ($result) {
 
 // 4. Fermeture de la connexion
 mysqli_close($id_connexion);
+
+
 ?>
