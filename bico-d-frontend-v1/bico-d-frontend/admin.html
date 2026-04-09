@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BICO-D | Espace Administrateur</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body admin-theme">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header admin-header">
+    <div class="brand-icon-sm">
+      <svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="8" fill="currentColor"/><rect x="4" y="26" width="14" height="8" rx="4" fill="currentColor" opacity=".7"/><rect x="42" y="26" width="14" height="8" rx="4" fill="currentColor" opacity=".7"/><rect x="26" y="4" width="8" height="14" rx="4" fill="currentColor" opacity=".7"/><rect x="26" y="42" width="8" height="14" rx="4" fill="currentColor" opacity=".7"/></svg>
+    </div>
+    <div>
+      <span>BICO-D</span>
+      <div class="admin-badge">ADMIN</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="showSection('dashboard')" data-s="dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Vue d'ensemble
+    </a>
+    <a class="nav-item" onclick="showSection('tousLesDrones')" data-s="tousLesDrones">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 9V7a2 2 0 012-2h2M19 9V7a2 2 0 00-2-2h-2M3 15v2a2 2 0 002 2h2M19 15v2a2 2 0 01-2 2h-2"/></svg>
+      Tous les drones
+    </a>
+    <a class="nav-item" onclick="showSection('reservations')" data-s="reservations">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Demandes de réservation
+      <span class="nav-badge" id="navBadgeRes"></span>
+    </a>
+    <a class="nav-item" onclick="showSection('depots')" data-s="depots">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Dépôts de drones
+      <span class="nav-badge" id="navBadgeDep"></span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar admin" id="userAvatar">A</div>
+    <div class="user-meta">
+      <div class="user-name" id="userName">—</div>
+      <div class="user-role">🛡️ Administrateur</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Déconnexion">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    </button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar admin-topbar">
+    <button class="burger" onclick="toggleSidebar()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-title" id="topbarTitle">Vue d'ensemble</span>
+  </div>
+
+  <!-- DASHBOARD ADMIN -->
+  <section id="dashboard" class="section active">
+    <div class="section-header">
+      <h3>Tableau de bord administrateur</h3>
+      <p>Bonjour, <strong id="dashWelcome">—</strong> 👋</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card green">
+        <div class="stat-ico green">🚁</div>
+        <div><div class="stat-val" id="sLibres">0</div><div class="stat-lbl">Drones libres</div></div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-ico orange">🛫</div>
+        <div><div class="stat-val" id="sMission">0</div><div class="stat-lbl">En mission</div></div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-ico blue">🔧</div>
+        <div><div class="stat-val" id="sMaint">0</div><div class="stat-lbl">Maintenance</div></div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-ico red">⏳</div>
+        <div><div class="stat-val" id="sPending">0</div><div class="stat-lbl">En attente</div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="dash-card">
+        <h4>Réservations en attente</h4>
+        <div id="dashPendingRes"></div>
+      </div>
+      <div class="dash-card">
+        <h4>Dépôts en attente</h4>
+        <div id="dashPendingDep"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOUS LES DRONES -->
+  <section id="tousLesDrones" class="section">
+    <div class="section-header">
+      <h3>Tous les drones</h3>
+      <p>Gérez le statut de chaque drone de la flotte</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterAdminDrones('tous',this)">Tous</button>
+      <button class="filter-btn" onclick="filterAdminDrones('libre',this)">Libres</button>
+      <button class="filter-btn" onclick="filterAdminDrones('mission',this)">En mission</button>
+      <button class="filter-btn" onclick="filterAdminDrones('maintenance',this)">Maintenance</button>
+    </div>
+    <div id="adminDronesGrid" class="drones-grid"></div>
+  </section>
+
+  <!-- RÉSERVATIONS -->
+  <section id="reservations" class="section">
+    <div class="section-header">
+      <h3>Demandes de réservation</h3>
+      <p>Validez ou rejetez les demandes des utilisateurs</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('resAttente',this)">En attente <span class="tab-cnt" id="cntResAttente"></span></button>
+      <button class="tab" onclick="switchTab('resToutes',this)">Toutes</button>
+    </div>
+    <div id="resAttente" class="tab-pane active"><div id="listResAttente"></div></div>
+    <div id="resToutes"  class="tab-pane"><div id="listResToutes"></div></div>
+  </section>
+
+  <!-- DÉPÔTS -->
+  <section id="depots" class="section">
+    <div class="section-header">
+      <h3>Dépôts de drones</h3>
+      <p>Confirmez ou rejetez les drones proposés par les utilisateurs</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('depAttente',this)">En attente <span class="tab-cnt" id="cntDepAttente"></span></button>
+      <button class="tab" onclick="switchTab('depTous',this)">Tous</button>
+    </div>
+    <div id="depAttente" class="tab-pane active"><div id="listDepAttente"></div></div>
+    <div id="depTous"    class="tab-pane"><div id="listDepTous"></div></div>
+  </section>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

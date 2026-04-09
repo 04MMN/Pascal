@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BICO-D | Espace Utilisateur</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-body">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="brand-icon-sm">
+      <svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="8" fill="currentColor"/><rect x="4" y="26" width="14" height="8" rx="4" fill="currentColor" opacity=".7"/><rect x="42" y="26" width="14" height="8" rx="4" fill="currentColor" opacity=".7"/><rect x="26" y="4" width="8" height="14" rx="4" fill="currentColor" opacity=".7"/><rect x="26" y="42" width="8" height="14" rx="4" fill="currentColor" opacity=".7"/></svg>
+    </div>
+    <span>BICO-D</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="showSection('dashboard')" data-s="dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" onclick="showSection('drones')" data-s="drones">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M3 9V7a2 2 0 012-2h2M19 9V7a2 2 0 00-2-2h-2M3 15v2a2 2 0 002 2h2M19 15v2a2 2 0 01-2 2h-2"/></svg>
+      Drones disponibles
+    </a>
+    <a class="nav-item" onclick="showSection('reserver')" data-s="reserver">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Réserver un drone
+    </a>
+    <a class="nav-item" onclick="showSection('deposer')" data-s="deposer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+      Déposer un drone
+    </a>
+    <a class="nav-item" onclick="showSection('mesDemandes')" data-s="mesDemandes">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Mes demandes
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-avatar" id="userAvatar">U</div>
+    <div class="user-meta">
+      <div class="user-name" id="userName">—</div>
+      <div class="user-role">👤 Agriculteur</div>
+    </div>
+    <button class="logout-btn" onclick="logout()" title="Déconnexion">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    </button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <button class="burger" onclick="toggleSidebar()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-title" id="topbarTitle">Dashboard</span>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section active">
+    <div class="section-header">
+      <h3>Vue d'ensemble</h3>
+      <p>Bonjour, <strong id="dashWelcome">—</strong> 👋</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card green">
+        <div class="stat-ico green">🚁</div>
+        <div><div class="stat-val" id="statLibres">0</div><div class="stat-lbl">Drones disponibles</div></div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-ico blue">📅</div>
+        <div><div class="stat-val" id="statMesRes">0</div><div class="stat-lbl">Mes réservations</div></div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-ico purple">📤</div>
+        <div><div class="stat-val" id="statMesDep">0</div><div class="stat-lbl">Mes dépôts</div></div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="dash-card">
+        <h4>Drones libres</h4>
+        <div id="dashDronesList"></div>
+      </div>
+      <div class="dash-card">
+        <h4>Mes dernières demandes</h4>
+        <div id="dashActivity"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DRONES -->
+  <section id="drones" class="section">
+    <div class="section-header">
+      <h3>Flotte de Drones</h3>
+      <p>Tous les drones de la plateforme</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterDrones('tous',this)">Tous</button>
+      <button class="filter-btn" onclick="filterDrones('libre',this)">Disponibles</button>
+      <button class="filter-btn" onclick="filterDrones('mission',this)">En mission</button>
+      <button class="filter-btn" onclick="filterDrones('maintenance',this)">Maintenance</button>
+    </div>
+    <div id="dronesGrid" class="drones-grid"></div>
+  </section>
+
+  <!-- RÉSERVER -->
+  <section id="reserver" class="section">
+    <div class="section-header">
+      <h3>Réserver un drone</h3>
+      <p>Soumettez votre demande — l'administrateur validera avant confirmation</p>
+    </div>
+    <div class="form-card">
+      <div id="resAlert" class="form-alert" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Drone à réserver <span class="req">*</span></label>
+          <select id="r_drone">
+            <option value="">-- Sélectionner un drone libre --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nom de la mission <span class="req">*</span></label>
+          <input type="text" id="r_nom" placeholder="Ex : Surveillance champ blé nord">
+        </div>
+        <div class="form-group">
+          <label>Date souhaitée <span class="req">*</span></label>
+          <input type="date" id="r_date">
+        </div>
+        <div class="form-group">
+          <label>Durée estimée (heures)</label>
+          <input type="number" id="r_duree" placeholder="Ex : 3" min="1" max="24">
+        </div>
+        <div class="form-group full">
+          <label>Description de la mission</label>
+          <textarea id="r_desc" rows="3" placeholder="Zone couverte, type de culture, besoins spécifiques..."></textarea>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-primary" onclick="submitReservation()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Envoyer la demande
+        </button>
+        <div class="info-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Votre demande sera examinée par un administrateur avant confirmation.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DÉPOSER -->
+  <section id="deposer" class="section">
+    <div class="section-header">
+      <h3>Déposer un drone pour location</h3>
+      <p>Proposez votre drone — l'administrateur le publiera après vérification</p>
+    </div>
+    <div class="form-card">
+      <div id="depAlert" class="form-alert" style="display:none"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom du drone <span class="req">*</span></label>
+          <input type="text" id="d_nom" placeholder="Ex : Agro-Drone Pro X2">
+        </div>
+        <div class="form-group">
+          <label>Type de capteur <span class="req">*</span></label>
+          <select id="d_capteur">
+            <option value="">-- Choisir --</option>
+            <option>RGB</option><option>Multispectral</option><option>Thermique</option>
+            <option>LiDAR</option><option>Pulvérisation</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Marque / Modèle</label>
+          <input type="text" id="d_modele" placeholder="Ex : DJI Agras T40">
+        </div>
+        <div class="form-group">
+          <label>Prix par heure (FCFA)</label>
+          <input type="number" id="d_prix" placeholder="Ex : 15000" min="0">
+        </div>
+        <div class="form-group">
+          <label>Autonomie (minutes)</label>
+          <input type="number" id="d_autonomie" placeholder="Ex : 45" min="1">
+        </div>
+        <div class="form-group">
+          <label>Localisation</label>
+          <input type="text" id="d_localisation" placeholder="Ex : Thiès, Sénégal">
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea id="d_desc" rows="3" placeholder="Caractéristiques, état, capacités, conditions de location..."></textarea>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn btn-primary" onclick="submitDepot()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Soumettre le drone
+        </button>
+        <div class="info-note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          L'administrateur vérifiera les informations avant publication.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MES DEMANDES -->
+  <section id="mesDemandes" class="section">
+    <div class="section-header">
+      <h3>Mes demandes</h3>
+      <p>Suivez le statut de vos réservations et dépôts</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tabRes',this)">Réservations</button>
+      <button class="tab" onclick="switchTab('tabDep',this)">Dépôts</button>
+    </div>
+    <div id="tabRes" class="tab-pane active"><div id="myResList"></div></div>
+    <div id="tabDep" class="tab-pane"><div id="myDepList"></div></div>
+  </section>
+</main>
+
+<script src="js/data.js"></script>
+<script src="js/user.js"></script>
+</body>
+</html>

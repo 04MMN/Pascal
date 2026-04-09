@@ -1,36 +1,42 @@
 // ═══════════════════════════════════════════════
-//  data.js — API calls + utilitaires partagés
+//  data.js — Données partagées + utilitaires
 // ═══════════════════════════════════════════════
 
-const API = 'api/api.php';
+const USERS = [
+  { id: 1, email: 'user@bicod.sn',  password: '1234',  nom: 'Moussa Diallo', role: 'user' },
+  { id: 2, email: 'admin@bicod.sn', password: 'admin', nom: 'Aminata Faye',  role: 'admin' },
+  { id: 3, email: 'jean@bicod.sn',  password: '1234',  nom: 'Jean Dupont',   role: 'user' },
+];
 
-// ── Appel API générique ───────────────────────────
-async function apiGet(action, params = {}) {
-  const qs = new URLSearchParams({ action, ...params }).toString();
-  const res = await fetch(`${API}?${qs}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+const DRONES_INIT = [
+  { id: 1, nom: 'Agro-Pro X1',    type_cap: 'Multispectral', status: 'libre',       modele: 'DJI Agras T30',    prix: 12000, autonomie: 45, localisation: 'Thiès',       desc: 'Drone de précision pour analyse végétale' },
+  { id: 2, nom: 'SkyField-3',     type_cap: 'RGB',           status: 'mission',     modele: 'Parrot Bluegrass', prix: 8000,  autonomie: 35, localisation: 'Dakar',       desc: 'Idéal pour cartographie et surveillance' },
+  { id: 3, nom: 'ThermoScan Pro', type_cap: 'Thermique',     status: 'libre',       modele: 'Yuneec H520T',     prix: 18000, autonomie: 50, localisation: 'Saint-Louis', desc: 'Détection de stress hydrique' },
+  { id: 4, nom: 'LiDAR Mapper',   type_cap: 'LiDAR',         status: 'maintenance', modele: 'DJI Matrice 300',  prix: 25000, autonomie: 55, localisation: 'Kaolack',     desc: 'Cartographie 3D haute précision' },
+  { id: 5, nom: 'SprayBot Alpha', type_cap: 'Pulvérisation', status: 'libre',       modele: 'XAG P100',         prix: 20000, autonomie: 40, localisation: 'Ziguinchor',  desc: 'Pulvérisation de précision 10L/min' },
+];
+
+// ── Init localStorage ────────────────────────────
+function initStorage() {
+  if (!localStorage.getItem('bd_drones'))       localStorage.setItem('bd_drones',       JSON.stringify(DRONES_INIT));
+  if (!localStorage.getItem('bd_reservations')) localStorage.setItem('bd_reservations', JSON.stringify([]));
+  if (!localStorage.getItem('bd_depots'))        localStorage.setItem('bd_depots',        JSON.stringify([]));
 }
 
-async function apiPost(action, body = {}) {
-  const res = await fetch(`${API}?action=${action}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.message || `HTTP ${res.status}`);
-  }
-  return res.json();
-}
+// ── CRUD helpers ─────────────────────────────────
+function getDrones()       { return JSON.parse(localStorage.getItem('bd_drones')       || '[]'); }
+function getReservations() { return JSON.parse(localStorage.getItem('bd_reservations') || '[]'); }
+function getDepots()       { return JSON.parse(localStorage.getItem('bd_depots')       || '[]'); }
+function saveDrones(d)     { localStorage.setItem('bd_drones',       JSON.stringify(d)); }
+function saveReservations(r){ localStorage.setItem('bd_reservations', JSON.stringify(r)); }
+function saveDepots(d)     { localStorage.setItem('bd_depots',        JSON.stringify(d)); }
 
-// ── Auth ──────────────────────────────────────────
 function getCurrentUser() {
-  const u = sessionStorage.getItem('bd_user');
+  const u = localStorage.getItem('bd_current_user');
   return u ? JSON.parse(u) : null;
 }
 
+// ── Auth guard ────────────────────────────────────
 function requireRole(role) {
   const user = getCurrentUser();
   if (!user) { window.location.href = 'index.html'; return null; }
@@ -39,11 +45,9 @@ function requireRole(role) {
 }
 
 function logout() {
-  sessionStorage.removeItem('bd_user');
+  localStorage.removeItem('bd_current_user');
   window.location.href = 'index.html';
 }
-
-// Initialisé au chargement (plus de localStorage nécessaire)
 
 // ── Helpers UI ────────────────────────────────────
 function droneEmoji(type) {
@@ -108,4 +112,5 @@ function switchTab(id, btn) {
   document.getElementById(id).classList.add('active');
 }
 
-
+// Initialisé au chargement
+initStorage();

@@ -1,4 +1,4 @@
-// admin.js — Espace administrateur
+// admin.js — Espace administrateur (connecté à l'API)
 
 const currentUser = requireRole('admin');
 if (currentUser) {
@@ -19,91 +19,99 @@ function renderSection(id) {
   }
 }
 
-// ── Mise à jour badges nav ──────────────────────
-function updateNavBadges() {
-  const pRes = getReservations().filter(r => r.status === 'attente').length;
-  const pDep = getDepots().filter(d => d.status === 'attente').length;
-  const elR = document.getElementById('navBadgeRes');
-  const elD = document.getElementById('navBadgeDep');
-  elR.textContent = pRes > 0 ? pRes : '';
-  elD.textContent = pDep > 0 ? pDep : '';
+// ── Badges nav ───────────────────────────────────
+async function updateNavBadges() {
+  try {
+    const data = await apiGet('get_stats');
+    const s    = data.stats;
+    const pRes = s.reservations?.attente || 0;
+    const pDep = s.depots?.attente       || 0;
+    document.getElementById('navBadgeRes').textContent = pRes > 0 ? pRes : '';
+    document.getElementById('navBadgeDep').textContent = pDep > 0 ? pDep : '';
+  } catch(e) {}
 }
 
 // ── DASHBOARD ADMIN ──────────────────────────────
-function renderAdminDashboard() {
-  const drones = getDrones();
-  const res    = getReservations();
-  const deps   = getDepots();
-  const pendingAll = res.filter(r => r.status === 'attente').length + deps.filter(d => d.status === 'attente').length;
+async function renderAdminDashboard() {
+  try {
+    const [statsData, resData, depData] = await Promise.all([
+      apiGet('get_stats'),
+      apiGet('get_reservations', { status: 'attente' }),
+      apiGet('get_depots',       { status: 'attente' }),
+    ]);
 
-  document.getElementById('sLibres').textContent  = drones.filter(d => d.status === 'libre').length;
-  document.getElementById('sMission').textContent = drones.filter(d => d.status === 'mission').length;
-  document.getElementById('sMaint').textContent   = drones.filter(d => d.status === 'maintenance').length;
-  document.getElementById('sPending').textContent = pendingAll;
-  updateNavBadges();
+    const s    = statsData.stats;
+    const pRes = resData.reservations || [];
+    const pDep = depData.depots       || [];
 
-  // Réservations en attente (mini)
-  const pendRes = res.filter(r => r.status === 'attente');
-  const elPR = document.getElementById('dashPendingRes');
-  elPR.innerHTML = pendRes.length === 0 ? emptyState('Aucune réservation en attente') :
-    pendRes.slice(0, 4).map(r => {
-      const drone = drones.find(d => d.id === r.droneId);
-      return `<div class="mini-row">
-        <div>
-          <div style="font-size:.86rem;color:var(--text)"><strong>${r.userNom}</strong> — ${r.nomMission}</div>
-          <div style="font-size:.75rem;color:var(--text3)">${drone ? drone.nom : '?'} · ${r.date}</div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn-mini btn-ok"  onclick="validateRes(${r.id},'approuve')">✓</button>
-          <button class="btn-mini btn-ko"  onclick="validateRes(${r.id},'rejete')">✗</button>
-        </div>
-      </div>`;
-    }).join('');
+    document.getElementById('sLibres').textContent  = s.drones?.libre       || 0;
+    document.getElementById('sMission').textContent = s.drones?.mission      || 0;
+    document.getElementById('sMaint').textContent   = s.drones?.maintenance  || 0;
+    document.getElementById('sPending').textContent = (s.reservations?.attente || 0) + (s.depots?.attente || 0);
 
-  // Dépôts en attente (mini)
-  const pendDep = deps.filter(d => d.status === 'attente');
-  const elPD = document.getElementById('dashPendingDep');
-  elPD.innerHTML = pendDep.length === 0 ? emptyState('Aucun dépôt en attente') :
-    pendDep.slice(0, 4).map(d => `
-      <div class="mini-row">
-        <div>
-          <div style="font-size:.86rem;color:var(--text)">${droneEmoji(d.type_cap)} <strong>${d.nom}</strong></div>
-          <div style="font-size:.75rem;color:var(--text3)">${d.userNom} · ${d.type_cap}</div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <button class="btn-mini btn-ok" onclick="validateDep(${d.id},'approuve')">✓</button>
-          <button class="btn-mini btn-ko" onclick="validateDep(${d.id},'rejete')">✗</button>
-        </div>
-      </div>`).join('');
+    // Réservations en attente (mini)
+    document.getElementById('dashPendingRes').innerHTML = pRes.length === 0 ? emptyState('Aucune réservation en attente') :
+      pRes.slice(0, 4).map(r => `
+        <div class="mini-row">
+          <div>
+            <div style="font-size:.86rem;color:var(--text)"><strong>${r.user_nom}</strong> — ${r.nom_mission}</div>
+            <div style="font-size:.75rem;color:var(--text3)">${r.drone_nom || '?'} · ${r.date_mission}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-mini btn-ok" onclick="validateRes(${r.id},'approuve')">✓</button>
+            <button class="btn-mini btn-ko" onclick="validateRes(${r.id},'rejete')">✗</button>
+          </div>
+        </div>`).join('');
+
+    // Dépôts en attente (mini)
+    document.getElementById('dashPendingDep').innerHTML = pDep.length === 0 ? emptyState('Aucun dépôt en attente') :
+      pDep.slice(0, 4).map(d => `
+        <div class="mini-row">
+          <div>
+            <div style="font-size:.86rem;color:var(--text)">${droneEmoji(d.type_cap)} <strong>${d.nom}</strong></div>
+            <div style="font-size:.75rem;color:var(--text3)">${d.user_nom} · ${d.type_cap}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-mini btn-ok" onclick="validateDep(${d.id},'approuve')">✓</button>
+            <button class="btn-mini btn-ko" onclick="validateDep(${d.id},'rejete')">✗</button>
+          </div>
+        </div>`).join('');
+
+    updateNavBadges();
+  } catch(e) { console.error('Dashboard error:', e); }
 }
 
 // ── TOUS LES DRONES ──────────────────────────────
-function renderAdminDrones() {
-  let list = getDrones();
-  if (adminDroneFilter !== 'tous') list = list.filter(d => d.status === adminDroneFilter);
+async function renderAdminDrones() {
   const grid = document.getElementById('adminDronesGrid');
-  if (list.length === 0) { grid.innerHTML = emptyState('Aucun drone'); return; }
-  grid.innerHTML = list.map(d => `
-    <div class="drone-card ${d.status}">
-      <div class="drone-card-top">
-        <span style="font-size:1.8rem">${droneEmoji(d.type_cap)}</span>
-        ${statusBadge(d.status)}
-      </div>
-      <div class="drone-name">${d.nom}</div>
-      <div class="drone-type">${d.type_cap} · ${d.modele || ''}</div>
-      <div class="drone-meta">
-        <span>📍 ${d.localisation || 'N/A'}</span>
-        <span>⏱ ${d.autonomie || '?'} min</span>
-      </div>
-      <div style="margin-top:12px">
-        <select class="status-select" onchange="changeDroneStatus(${d.id}, this.value)">
-          <option value="">Changer le statut</option>
-          <option value="libre"       ${d.status==='libre'       ?'selected':''}>Libre</option>
-          <option value="mission"     ${d.status==='mission'     ?'selected':''}>En mission</option>
-          <option value="maintenance" ${d.status==='maintenance' ?'selected':''}>Maintenance</option>
-        </select>
-      </div>
-    </div>`).join('');
+  grid.innerHTML = '<div class="empty-state">⏳ Chargement...</div>';
+  try {
+    const params = adminDroneFilter !== 'tous' ? { status: adminDroneFilter } : {};
+    const data   = await apiGet('get_drones', params);
+    const list   = data.drones || [];
+    if (list.length === 0) { grid.innerHTML = emptyState('Aucun drone'); return; }
+    grid.innerHTML = list.map(d => `
+      <div class="drone-card ${d.status}">
+        <div class="drone-card-top">
+          <span style="font-size:1.8rem">${droneEmoji(d.type_cap)}</span>
+          ${statusBadge(d.status)}
+        </div>
+        <div class="drone-name">${d.nom}</div>
+        <div class="drone-type">${d.type_cap} · ${d.modele || ''}</div>
+        <div class="drone-meta">
+          <span>📍 ${d.localisation || 'N/A'}</span>
+          <span>⏱ ${d.autonomie || '?'} min</span>
+        </div>
+        <div style="margin-top:12px">
+          <select class="status-select" onchange="changeDroneStatus(${d.id}, this.value)">
+            <option value="">Changer le statut</option>
+            <option value="libre"       ${d.status==='libre'       ?'selected':''}>Libre</option>
+            <option value="mission"     ${d.status==='mission'     ?'selected':''}>En mission</option>
+            <option value="maintenance" ${d.status==='maintenance' ?'selected':''}>Maintenance</option>
+          </select>
+        </div>
+      </div>`).join('');
+  } catch(e) { grid.innerHTML = emptyState('Erreur de chargement'); }
 }
 
 function filterAdminDrones(f, btn) {
@@ -113,42 +121,44 @@ function filterAdminDrones(f, btn) {
   renderAdminDrones();
 }
 
-function changeDroneStatus(id, newStatus) {
+async function changeDroneStatus(id, newStatus) {
   if (!newStatus) return;
-  const drones = getDrones();
-  const d = drones.find(d => d.id === id);
-  if (d) { d.status = newStatus; saveDrones(drones); renderAdminDrones(); updateNavBadges(); }
+  try {
+    await apiPost('update_drone_status', { drone_id: id, status: newStatus });
+    renderAdminDrones();
+    updateNavBadges();
+  } catch(e) { alert('Erreur : ' + e.message); }
 }
 
 // ── RÉSERVATIONS ─────────────────────────────────
-function renderAdminRes() {
-  const drones = getDrones();
-  const all  = getReservations().reverse();
-  const pend = all.filter(r => r.status === 'attente');
-  document.getElementById('cntResAttente').textContent = pend.length > 0 ? pend.length : '';
+async function renderAdminRes() {
+  try {
+    const [pendData, allData] = await Promise.all([
+      apiGet('get_reservations', { status: 'attente' }),
+      apiGet('get_reservations'),
+    ]);
+    const pend = pendData.reservations || [];
+    const all  = allData.reservations  || [];
 
-  document.getElementById('listResAttente').innerHTML = pend.length === 0 ? emptyState('Aucune demande en attente') :
-    pend.map(r => resCard(r, drones, true)).join('');
-
-  document.getElementById('listResToutes').innerHTML = all.length === 0 ? emptyState('Aucune réservation') :
-    all.map(r => resCard(r, drones, false)).join('');
-
-  updateNavBadges();
+    document.getElementById('cntResAttente').textContent = pend.length > 0 ? pend.length : '';
+    document.getElementById('listResAttente').innerHTML  = pend.length === 0 ? emptyState('Aucune demande en attente') : pend.map(r => resCard(r, true)).join('');
+    document.getElementById('listResToutes').innerHTML   = all.length  === 0 ? emptyState('Aucune réservation')        : all.map(r => resCard(r, false)).join('');
+    updateNavBadges();
+  } catch(e) { console.error(e); }
 }
 
-function resCard(r, drones, withActions) {
-  const drone = drones.find(d => d.id === r.droneId);
+function resCard(r, withActions) {
   return `<div class="request-row">
     <div class="req-info">
-      <div class="req-title">📅 ${r.nomMission}</div>
+      <div class="req-title">📅 ${r.nom_mission}</div>
       <div class="req-meta">
-        <span>Par : <strong>${r.userNom}</strong></span>
-        <span>Drone : <strong>${drone ? drone.nom : '#'+r.droneId}</strong></span>
-        <span>Date : <strong>${r.date}</strong></span>
-        <span>Durée : <strong>${r.duree}h</strong></span>
-        <span>Soumis : <strong>${r.dateSoumission}</strong></span>
+        <span>Par : <strong>${r.user_nom}</strong></span>
+        <span>Drone : <strong>${r.drone_nom || '#'+r.drone_id}</strong></span>
+        <span>Date : <strong>${r.date_mission}</strong></span>
+        <span>Durée : <strong>${r.duree ? r.duree+'h' : 'N/A'}</strong></span>
+        <span>Soumis : <strong>${r.created_at?.split(' ')[0]}</strong></span>
       </div>
-      ${r.desc ? `<p class="req-desc">${r.desc}</p>` : ''}
+      ${r.description ? `<p class="req-desc">${r.description}</p>` : ''}
     </div>
     <div class="req-actions">
       ${withActions
@@ -159,34 +169,29 @@ function resCard(r, drones, withActions) {
   </div>`;
 }
 
-function validateRes(id, action) {
-  const res = getReservations();
-  const r   = res.find(r => r.id === id);
-  if (!r) return;
-  r.status = action;
-  if (action === 'approuve') {
-    const drones = getDrones();
-    const drone  = drones.find(d => d.id === r.droneId);
-    if (drone) { drone.status = 'mission'; saveDrones(drones); }
-  }
-  saveReservations(res);
-  renderAdminRes();
-  renderAdminDashboard();
+async function validateRes(id, action) {
+  try {
+    await apiPost('valider_reservation', { reservation_id: id, action });
+    renderAdminRes();
+    renderAdminDashboard();
+  } catch(e) { alert('Erreur : ' + e.message); }
 }
 
 // ── DÉPÔTS ────────────────────────────────────────
-function renderAdminDep() {
-  const all  = getDepots().reverse();
-  const pend = all.filter(d => d.status === 'attente');
-  document.getElementById('cntDepAttente').textContent = pend.length > 0 ? pend.length : '';
+async function renderAdminDep() {
+  try {
+    const [pendData, allData] = await Promise.all([
+      apiGet('get_depots', { status: 'attente' }),
+      apiGet('get_depots'),
+    ]);
+    const pend = pendData.depots || [];
+    const all  = allData.depots  || [];
 
-  document.getElementById('listDepAttente').innerHTML = pend.length === 0 ? emptyState('Aucun dépôt en attente') :
-    pend.map(d => depCard(d, true)).join('');
-
-  document.getElementById('listDepTous').innerHTML = all.length === 0 ? emptyState('Aucun dépôt') :
-    all.map(d => depCard(d, false)).join('');
-
-  updateNavBadges();
+    document.getElementById('cntDepAttente').textContent = pend.length > 0 ? pend.length : '';
+    document.getElementById('listDepAttente').innerHTML  = pend.length === 0 ? emptyState('Aucun dépôt en attente') : pend.map(d => depCard(d, true)).join('');
+    document.getElementById('listDepTous').innerHTML     = all.length  === 0 ? emptyState('Aucun dépôt')            : all.map(d => depCard(d, false)).join('');
+    updateNavBadges();
+  } catch(e) { console.error(e); }
 }
 
 function depCard(d, withActions) {
@@ -194,14 +199,14 @@ function depCard(d, withActions) {
     <div class="req-info">
       <div class="req-title">${droneEmoji(d.type_cap)} ${d.nom}</div>
       <div class="req-meta">
-        <span>Par : <strong>${d.userNom}</strong></span>
+        <span>Par : <strong>${d.user_nom}</strong></span>
         <span>Capteur : <strong>${d.type_cap}</strong></span>
         ${d.modele ? `<span>Modèle : <strong>${d.modele}</strong></span>` : ''}
         ${d.prix ? `<span>Prix : <strong>${Number(d.prix).toLocaleString()} FCFA/h</strong></span>` : ''}
         ${d.localisation ? `<span>📍 <strong>${d.localisation}</strong></span>` : ''}
-        <span>Soumis : <strong>${d.dateSoumission}</strong></span>
+        <span>Soumis : <strong>${d.created_at?.split(' ')[0]}</strong></span>
       </div>
-      ${d.desc ? `<p class="req-desc">${d.desc}</p>` : ''}
+      ${d.description ? `<p class="req-desc">${d.description}</p>` : ''}
     </div>
     <div class="req-actions">
       ${withActions
@@ -212,22 +217,10 @@ function depCard(d, withActions) {
   </div>`;
 }
 
-function validateDep(id, action) {
-  const deps = getDepots();
-  const dep  = deps.find(d => d.id === id);
-  if (!dep) return;
-  dep.status = action;
-  if (action === 'approuve') {
-    const drones = getDrones();
-    drones.push({
-      id: Date.now(), nom: dep.nom, type_cap: dep.type_cap,
-      modele: dep.modele || '', status: 'libre',
-      prix: dep.prix, autonomie: dep.autonomie,
-      localisation: dep.localisation, desc: dep.desc, proprio: dep.userId
-    });
-    saveDrones(drones);
-  }
-  saveDepots(deps);
-  renderAdminDep();
-  renderAdminDashboard();
+async function validateDep(id, action) {
+  try {
+    await apiPost('valider_depot', { depot_id: id, action });
+    renderAdminDep();
+    renderAdminDashboard();
+  } catch(e) { alert('Erreur : ' + e.message); }
 }
